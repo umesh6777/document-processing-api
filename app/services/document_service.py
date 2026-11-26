@@ -83,7 +83,8 @@ def list_documents(
     if status is not None:
         query = query.where(Document.status == status)
     if search:
-        query = query.where(Document.filename.ilike(f"%{search}%"))
+        # autoescape: "%" and "_" in the search text are matched literally, not as wildcards.
+        query = query.where(Document.filename.icontains(search, autoescape=True))
 
     total = db.scalar(select(func.count()).select_from(query.subquery())) or 0
     items = db.scalars(query.order_by(Document.id.desc()).offset(offset).limit(limit)).all()

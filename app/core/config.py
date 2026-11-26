@@ -1,5 +1,6 @@
 from functools import lru_cache
 
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -11,9 +12,10 @@ class Settings(BaseSettings):
     app_name: str = "Document Management API"
     database_url: str = "sqlite:///./app.db"
     upload_dir: str = "uploads"
-    max_upload_size_mb: int = 10
-    processing_delay_seconds: float = 2.0
-    processing_failure_rate: float = 0.0  # 0..1, lets you demo the 'failed' state
+    max_upload_size_mb: int = Field(default=10, gt=0)
+    processing_delay_seconds: float = Field(default=2.0, ge=0)
+    # Share of uploads (0..1) that fail on purpose, to demo the 'failed' state.
+    processing_failure_rate: float = Field(default=0.0, ge=0, le=1)
 
     @property
     def max_upload_size_bytes(self) -> int:
